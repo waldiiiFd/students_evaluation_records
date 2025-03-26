@@ -23,8 +23,12 @@ class GroupController extends Controller
         $result = $this->groupService->index();
 
         return $result['success']
-            ? response()->json($result['data'])
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ])
             : response()->json([
+                'success' => false,
                 'message' => $result['message']
             ], 500);
     }
@@ -37,8 +41,13 @@ class GroupController extends Controller
         $result = $this->groupService->show($id);
 
         return $result['success']
-            ? response()->json($result['data'])
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ])
             : response()->json([
+                'success' => false,
+                'error' => 'Group not found',
                 'message' => $result['message']
             ], 404);
     }
@@ -51,9 +60,14 @@ class GroupController extends Controller
         $result = $this->groupService->store($request->all());
 
         return $result['success']
-            ? response()->json($result['data'], 201)
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ], 201)
             : response()->json([
-                'message' => $result['message']
+                'success' => false,
+                'errors' => $result['message'],
+                'message' => 'Validation error'
             ], 422);
     }
 
@@ -65,8 +79,13 @@ class GroupController extends Controller
         $result = $this->groupService->update($id, $request->all());
 
         return $result['success']
-            ? response()->json($result['data'])
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ])
             : response()->json([
+                'success' => false,
+                'error' => 'Group not found',
                 'message' => $result['message']
             ], 422);
     }
@@ -81,6 +100,8 @@ class GroupController extends Controller
         return $result['success']
             ? response()->noContent()
             : response()->json([
+                'success' => false,
+                'error' => 'Group not found',
                 'message' => $result['message']
             ], 404);
     }
