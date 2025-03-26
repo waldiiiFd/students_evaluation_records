@@ -3,125 +3,85 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Group;
-use Throwable;
-use Illuminate\Support\Facades\Validator;
+use App\Services\GroupService;
+use Illuminate\Http\JsonResponse;
 
 class GroupController extends Controller
 {
+    protected $groupService;
 
-    protected function groupModelValidation($request)
+    public function __construct(GroupService $groupService)
     {
-        $validator = Validator::make($request->all(), Group::rules());
-        if ($validator->fails()) {
-            return [
-                'success' => false,
-                'errors' => $validator->errors(),
-                'message' => 'Validation error'
-            ];
-        }
-        return ['success' => true];
+        $this->groupService = $groupService;
     }
 
     /**
-     * Display a listing of the resource.
+     * Listar todos los grupos
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(Group::all());
-    }
+        $result = $this->groupService->index();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $result = $this->groupModelValidation($request);
-        if (!$result['success']) {
-            return response()->json($result, 422);
-        }
-        $model = Group::create($request->all());
-        if (!$model) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Group not created'
+        return $result['success']
+            ? response()->json($result['data'])
+            : response()->json([
+                'message' => $result['message']
             ], 500);
-        }
-        return response()->json($model);
     }
 
     /**
-     * Display the specified resource.
+     * Mostrar un grupo específico
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
-        try {
-            return response()->json(Group::findOrFail($id));
-        } catch (Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Group not found',
-                'message' => $e->getMessage()
+        $result = $this->groupService->show($id);
+
+        return $result['success']
+            ? response()->json($result['data'])
+            : response()->json([
+                'message' => $result['message']
             ], 404);
-        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Crear un nuevo grupo
      */
-    public function update(Request $request, string $id)
+    public function store(Request $request): JsonResponse
     {
-        try {
-            $group = Group::findOrFail($id);
-        } catch (Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Group not found',
-                'message' => $e->getMessage()
-            ], 404);
-        }
+        $result = $this->groupService->store($request->all());
 
-        $result = $this->groupModelValidation($request);
-
-        if (!$result['success']) {
-            return response()->json($result, 422);
-        }
-
-        $updated = $group->update($request->all());
-
-        if (!$updated) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Group not updated'
-            ], 500);
-        }
-
-        return response()->json($group);
+        return $result['success']
+            ? response()->json($result['data'], 201)
+            : response()->json([
+                'message' => $result['message']
+            ], 422);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Actualizar un grupo
      */
-    public function destroy(string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
-        try {
-            $group = Group::findOrFail($id);
-            $deleted = $group->delete();
+        $result = $this->groupService->update($id, $request->all());
 
-            if (!$deleted) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to delete group'
-                ], 500);
-            }
+        return $result['success']
+            ? response()->json($result['data'])
+            : response()->json([
+                'message' => $result['message']
+            ], 422);
+    }
 
-            return response()->noContent();
-        } catch (Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Group not found',
-                'message' => $e->getMessage()
+    /**
+     * Eliminar un grupo
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $result = $this->groupService->destroy($id);
+
+        return $result['success']
+            ? response()->noContent()
+            : response()->json([
+                'message' => $result['message']
             ], 404);
-        }
     }
 }
