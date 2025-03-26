@@ -2,31 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
 use Illuminate\Http\Request;
-use App\Http\Requests\StudentStoreRequest;
-use Throwable;
-use Exception;
+use App\Services\StudentService;
+use Illuminate\Http\JsonResponse;
+
 
 class StudentController extends Controller
 {
+
+    protected $studentService;
+
+    public function __construct(StudentService $studentService)
+    {
+        $this->studentService = $studentService;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return response()->json(Student::all());
+        $result = $this->studentService->index();
+
+        return $result['success']
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ])
+            : response()->json([
+                'success' => false,
+                'message' => $result['message']
+            ], 500);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StudentStoreRequest $request)
+    public function store(Request $request)
     {
-        /*  dd('test'); */
+        $result = $this->studentService->store($request->all());
 
-        $student = Student::create($request->validated());
-        return response()->json($student);
+        return $result['success']
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ], 201)
+            : response()->json([
+                'success' => false,
+                'errors' => $result['message'],
+                'message' => 'Validation error'
+            ], 422);
     }
 
     /**
@@ -34,33 +58,37 @@ class StudentController extends Controller
      */
     public function show(string $id)
     {
-        try {
-            return response()->json(Student::findOrFail($id));
-        } catch (Throwable $e) {
-            return response()->json([
+        $result = $this->studentService->show($id);
+
+        return $result['success']
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ])
+            : response()->json([
                 'success' => false,
                 'error' => 'Student not found',
-                'message' => $e->getMessage()
+                'message' => $result['message']
             ], 404);
-        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(StudentStoreRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
-        try {
-            $student = Student::findOrFail($id);
-            $student->update($request->validated());
-            return response()->json($student);
-        } catch (Throwable $e) {
-            return response()->json([
+        $result = $this->studentService->update($id, $request->all());
+
+        return $result['success']
+            ? response()->json([
+                'success' => true,
+                'data' => $result['data']
+            ])
+            : response()->json([
                 'success' => false,
                 'error' => 'Student not found',
-                'message' => $e->getMessage()
-            ], 404);
-        }
+                'message' => $result['message']
+            ], 422);
     }
 
     /**
@@ -68,16 +96,16 @@ class StudentController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            $student = Student::findOrFail($id);
-            $student->delete();
-            return response()->noContent();
-        } catch (Throwable $e) {
-            return response()->json([
+        $result = $this->studentService->destroy($id);
+
+        return $result['success']
+            ? response()->json([
+                'success' => true,
+            ])
+            : response()->json([
                 'success' => false,
                 'error' => 'Student not found',
-                'message' => $e->getMessage()
+                'message' => $result['message']
             ], 404);
-        }
     }
 }

@@ -21,4 +21,12 @@ class Student extends Model
     {
         return $this->belongsToMany(Subject::class, 'evaluation_student');
     }
+
+    public static function rules()
+    {
+        return [
+            'fullname' => 'required|string|max:255',
+            'group_id' => 'required|exists:groups,id'
+        ];
+    }
 }

@@ -36,6 +36,9 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
+
+         /*  dd('test'); */
+         
         $result = $this->groupModelValidation($request);
         if (!$result['success']) {
             return response()->json($result, 422);

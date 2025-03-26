@@ -98,7 +98,9 @@ class GroupController extends Controller
         $result = $this->groupService->destroy($id);
 
         return $result['success']
-            ? response()->noContent()
+            ? response()->json([
+                'success' => true,
+            ])
             : response()->json([
                 'success' => false,
                 'error' => 'Group not found',
