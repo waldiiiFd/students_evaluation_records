@@ -10,7 +10,7 @@ class Student extends Model
     /** @use HasFactory<\Database\Factories\StudentFactory> */
     use HasFactory;
 
-    protected $fillable = ['fullname'];
+    protected $fillable = ['fullname', 'group_id'];
 
     public function group()
     {
@@ -19,6 +19,6 @@ class Student extends Model
 
     public function evaluation()
     {
-        return $this->belongsToMany(Subject::class, 'evaluations_students');
+        return $this->belongsToMany(Subject::class, 'evaluation_student');
     }
 }

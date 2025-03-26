@@ -16,4 +16,11 @@ class Group extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    public static function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+        ];
+    }
 }

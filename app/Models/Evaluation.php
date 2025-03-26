@@ -9,7 +9,7 @@ class Evaluation extends Model
 {
     /** @use HasFactory<\Database\Factories\EvaluationFactory> */
     use HasFactory;
-    protected $fillable = ['type', 'grade', 'evaluation_date'];
+    protected $fillable = ['type', 'grade', 'evaluation_date', 'subject_id', 'student_id'];
     public function subject()
     {
         return $this->belongsTo(Subject::class);
@@ -17,7 +17,6 @@ class Evaluation extends Model
 
     public function students()
     {
-        return $this->belongsToMany(Student::class, 'evaluations_students');
+        return $this->belongsToMany(Student::class, 'evaluation_student');
     }
-
 }
