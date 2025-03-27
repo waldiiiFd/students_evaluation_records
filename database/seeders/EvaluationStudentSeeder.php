@@ -22,7 +22,7 @@ class EvaluationStudentSeeder extends Seeder
             $randomEvaluations = $evaluations->random(rand(3, $maxEvals));
 
             foreach ($randomEvaluations as $evaluation) {
-                DB::table('evaluations_students')->insert([
+                DB::table('routes')->insert([
                     'student_id' => $student->id,
                     'evaluation_id' => $evaluation->id,
                     'created_at' => now(),

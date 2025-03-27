@@ -17,6 +17,16 @@ class Evaluation extends Model
 
     public function students()
     {
-        return $this->belongsToMany(Student::class, 'evaluation_student');
+        return $this->belongsToMany(Student::class, 'route');
+    }
+
+    public static function rules()
+    {
+        return [
+            'type' => 'required|string|max:255',
+            'grade' => 'nullable|numeric',
+            'evaluation_date' => 'required|date',
+            'subject_id' => 'required|exists:subjects,id',
+        ];
     }
 }

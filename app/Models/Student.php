@@ -19,7 +19,7 @@ class Student extends Model
 
     public function evaluation()
     {
-        return $this->belongsToMany(Subject::class, 'evaluation_student');
+        return $this->belongsToMany(Subject::class, 'routes');
     }
 
     public static function rules()

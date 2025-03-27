@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->integer('grade');
+            $table->float('grade')->nullable()->default(null);
             $table->date('evaluation_date');
             $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade');
             $table->timestamps();
