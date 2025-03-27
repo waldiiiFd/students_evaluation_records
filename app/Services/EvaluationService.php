@@ -3,26 +3,24 @@
 namespace App\Services;
 
 use App\Models\Evaluation;
-use Throwable;
-use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Throwable;
 
-class EvaluationService
+class EvaluationService extends BaseService
 {
-    private function validateEvaluationData(array $data): array
-    {
-        $validator = Validator::make($data, Evaluation::rules());
+    /**
+     * The model class associated with this service
+     *
+     * @var string
+     */
+    protected $modelClass = Evaluation::class;
 
-        if ($validator->fails()) {
-            return [
-                'success' => false,
-                'message' => $validator->errors()->first()
-            ];
-        }
-
-        return ['success' => true];
-    }
-
+    /**
+     * Process evaluation data before saving
+     *
+     * @param array $data
+     * @return array
+     */
     private function processEvaluationData(array $data): array
     {
         $evaluationDate = Carbon::parse($data['evaluation_date']);
@@ -35,41 +33,15 @@ class EvaluationService
         return $data;
     }
 
-    public function index(): array
-    {
-        try {
-            $evaluations = Evaluation::all();
-            return [
-                'success' => true,
-                'data' => $evaluations
-            ];
-        } catch (Throwable $e) {
-            return [
-                'success' => false,
-                'message' => 'Error al recuperar las evaluaciones: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    public function show(string $id): array
-    {
-        try {
-            $evaluation = Evaluation::findOrFail($id);
-            return [
-                'success' => true,
-                'data' => $evaluation
-            ];
-        } catch (Throwable $e) {
-            return [
-                'success' => false,
-                'message' => 'Evaluación no encontrada: ' . $e->getMessage()
-            ];
-        }
-    }
-
+    /**
+     * Override the store method to include data processing
+     *
+     * @param array $data
+     * @return array
+     */
     public function store(array $data): array
     {
-        $validationResult = $this->validateEvaluationData($data);
+        $validationResult = $this->validateData($data);
         if (!$validationResult['success']) {
             return $validationResult;
         }
@@ -90,12 +62,19 @@ class EvaluationService
         }
     }
 
+    /**
+     * Override the update method to include data processing
+     *
+     * @param string $id
+     * @param array $data
+     * @return array
+     */
     public function update(string $id, array $data): array
     {
         try {
             $evaluation = Evaluation::findOrFail($id);
 
-            $validationResult = $this->validateEvaluationData($data);
+            $validationResult = $this->validateData($data);
             if (!$validationResult['success']) {
                 return $validationResult;
             }
@@ -122,29 +101,5 @@ class EvaluationService
             ];
         }
     }
-
-    public function destroy(string $id): array
-    {
-        try {
-            $evaluation = Evaluation::findOrFail($id);
-            $deleted = $evaluation->delete();
-
-            if (!$deleted) {
-                return [
-                    'success' => false,
-                    'message' => 'No se pudo eliminar la evaluación'
-                ];
-            }
-
-            return [
-                'success' => true,
-                'data' => null
-            ];
-        } catch (Throwable $e) {
-            return [
-                'success' => false,
-                'message' => 'Error al eliminar la evaluación: ' . $e->getMessage()
-            ];
-        }
-    }
 }
+
