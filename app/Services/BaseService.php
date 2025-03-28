@@ -44,13 +44,10 @@ abstract class BaseService
     {
         try {
             $modelClass = $this->modelClass;
-            $query = $modelClass::query();
 
-            if (!empty($relations)) {
-                $query->with($relations);
-            }
-
-            $records = $query->get();
+            /*  $query = $modelClass::query();
+            $records = $query->get(); */
+            $records = $modelClass::all();
 
             return [
                 'success' => true,
@@ -74,13 +71,10 @@ abstract class BaseService
     {
         try {
             $modelClass = $this->modelClass;
-            $query = $modelClass::query();
 
-            if (!empty($relations)) {
-                $query->with($relations);
-            }
-
-            $record = $query->findOrFail($id);
+            /* $query = $modelClass::query();
+            $record = $query->findOrFail($id); */
+            $record = $modelClass::findOrFail($id);
 
             return [
                 'success' => true,
